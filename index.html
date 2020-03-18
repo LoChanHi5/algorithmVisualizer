@@ -6,8 +6,12 @@
   </head>
 
   <body>
-    <label for="matrixSize">Matrix Size (1 - 10):</label>
-    <input type="number" min="1" max="10" name="matrixSize" id="js-matrixSize">
+    <label for="matrixSize">Matrix Size (1 - 25):</label>
+    <input type="number" min="1" max="25" name="matrixSize" id="js-matrixSize">
+
+    <div id="js-algoList" class="algo-list">
+      <button type="button" id="js-randomSearch" class='button'>Random Search</button>
+    </div>
 
     <div id="js-matrix" class="matrix">
     </div>

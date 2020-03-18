@@ -1,10 +1,11 @@
 const matrixSizeElement = document.getElementById("js-matrixSize");
 const matrixElement = document.getElementById("js-matrix");
+const algoListElement = document.getElementById("js-algoList");
 
 matrixSizeElement.addEventListener("change", e => {
   const matrixSize = parseInt(e.target.value);
 
-  if (1 <= matrixSize && matrixSize <= 10) {
+  if (1 <= matrixSize && matrixSize <= 25) {
     updateMatrixBySize(matrixSize);
   }
 });
@@ -14,6 +15,18 @@ matrixElement.addEventListener("click", e => {
 
   if(target && target.id.startsWith("row-")) {
     updateStartAndEndCells(target);
+  }
+})
+
+algoListElement.addEventListener("click", e => {
+  if (!e.target) return;
+
+  switch(e.target.id) {
+    case 'js-randomSearch':
+      randomSearch();
+      break;
+    default:
+      return;
   }
 })
 
@@ -63,4 +76,10 @@ function updateStartAndEndCells(target) {
     tracker.startingCell = target;
     tracker.isStartingCellSet = true;
   }
+}
+
+function randomSearch() {
+  if (!tracker.startingCell || !tracker.endingCell) return;
+  console.log(tracker.startingCell);
+  console.log(tracker.endingCell);
 }
