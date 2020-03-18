@@ -9,6 +9,14 @@ matrixSizeElement.addEventListener("change", e => {
   }
 });
 
+matrixElement.addEventListener("click", e => {
+  const target = e.target;
+
+  if(target && target.id.startsWith("row-")) {
+    updateStartAndEndCells(target);
+  }
+})
+
 function updateMatrixBySize(matrixSize) {
   while(matrixElement.firstChild) {
     matrixElement.removeChild(matrixElement.lastChild)
@@ -27,5 +35,32 @@ function updateMatrixBySize(matrixSize) {
     }
 
     matrixElement.appendChild(colElement);
+  }
+}
+
+const tracker = {
+  startingCell: null,
+  endingCell: null,
+  isStartingCellSet: false,
+  isEndingCellSet: false
+}
+
+function updateStartAndEndCells(target) {
+  if (tracker.isStartingCellSet && tracker.isEndingCellSet) {
+    tracker.startingCell.style.backgroundColor = 'white';
+    target.style.backgroundColor = 'green';
+    tracker.startingCell = target;
+    tracker.isEndingCellSet = false;
+  } else if(tracker.isStartingCellSet) {
+    if(tracker.endingCell) {
+      tracker.endingCell.style.backgroundColor = 'white'
+    }
+    target.style.backgroundColor = 'black';
+    tracker.endingCell = target;
+    tracker.isEndingCellSet = true;
+  } else {
+    target.style.backgroundColor = 'green';
+    tracker.startingCell = target;
+    tracker.isStartingCellSet = true;
   }
 }
