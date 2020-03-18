@@ -1,18 +1,30 @@
 .column {
   list-style: none;
   padding: 0;
-  margin: 10px;
   display: inline-block;
 }
 
+.column:nth-child(odd) {
+  border-left: solid 5px #f00;
+  border-right: solid 5px #f00;
+}
+
+.column:last-child:nth-child(even) {
+  border-right: solid 5px #f00;
+}
+
 .row {
-  -moz-border-radius: 50px/50px;
-  -webkit-border-radius: 50px 50px;
-  border-radius: 50px/50px;
-  border: solid 5px #f00;
   width: 20px;
   height: 20px;
-  margin: 5px;
+}
+
+.row:nth-child(odd) {
+  border-top: solid 5px #f00;
+  border-bottom: solid 5px #f00;
+}
+
+.row:last-child:nth-child(even) {
+  border-bottom: solid 5px #f00;
 }
 
 .matrix {
