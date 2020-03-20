@@ -2,11 +2,16 @@ const matrixSizeElement = document.getElementById("js-matrixSize");
 const matrixElement = document.getElementById("js-matrix");
 const algoListElement = document.getElementById("js-algoList");
 
+document.addEventListener("DOMContentLoaded", e => {
+  updateMatrixBySize(20);
+});
+
 matrixSizeElement.addEventListener("change", e => {
   const matrixSize = parseInt(e.target.value);
 
   if (1 <= matrixSize && matrixSize <= 25) {
     updateMatrixBySize(matrixSize);
+    tracker.visited = {};
   }
 });
 
@@ -53,15 +58,6 @@ function updateMatrixBySize(matrixSize) {
   tracker.matrixSize = matrixSize;
 }
 
-const tracker = {
-  startingCell: null,
-  endingCell: null,
-  isStartingCellSet: false,
-  isEndingCellSet: false,
-  currentCell: null,
-  matrixSize: 0
-}
-
 function updateStartAndEndCells(target) {
   if (tracker.isStartingCellSet && tracker.isEndingCellSet) {
     tracker.startingCell.style.backgroundColor = 'white';
@@ -87,34 +83,39 @@ function randomSearch() {
 
   let direction;
   tracker.currentCell = tracker.startingCell;
+  tracker.visited[currentColRow(tracker.currentCell)] = true;
 
   while (tracker.currentCell != tracker.endingCell) {
-    paths = validPaths(tracker.currentCell)
+    paths = navigation.validPaths(tracker.currentCell)
     direction = Math.floor(Math.random() * 10) % paths.length;
 
     if (isNaN(direction)) return;
 
     switch(paths[direction]) {
       case 'up':
-        nextCell = up(tracker.currentCell);
-        break;
+        nextCell = navigation.up(tracker.currentCell); break;
       case 'right':
-        nextCell = right(tracker.currentCell);
+        nextCell = navigation.right(tracker.currentCell);
         break;
       case 'down':
-        nextCell = down(tracker.currentCell);
+        nextCell = navigation.down(tracker.currentCell);
         break;
       case 'left':
-        nextCell = left(tracker.currentCell);
+        nextCell = navigation.left(tracker.currentCell);
     }
 
     tracker.currentCell = nextCell;
     tracker.currentCell.style.backgroundColor = 'blue';
+    tracker.visited[currentColRow(tracker.currentCell)] = true;
   }
 
   if (tracker.currentCell == tracker.endingCell) {
     tracker.currentCell.style.backgroundColor = 'purple';
   }
+}
+
+function currentColRow(cell) {
+  return currentCol(cell) + '-' + currentRow(cell)
 }
 
 function currentRow(cell) {
@@ -125,51 +126,62 @@ function currentCol(cell) {
   return parseInt(cell.parentNode.id.split('-')[1]);
 }
 
-function isNotVisited(cell) {
-  return cell.style.backgroundColor == ''
-    || cell.style.backgroundColor == 'white'
-    || cell.style.backgroundColor == 'black';
+const navigation = {
+  up: function(cell) {
+    if (currentRow(cell) - 1 <= 0) return;
+
+    const nextCell = cell.previousSibling;
+
+    if (!this.isVisited(nextCell)) return nextCell;
+  },
+
+  right: function(cell) {
+    if (currentCol(cell) + 1 > tracker.matrixSize) return;
+
+    const nextCell = cell.parentNode.nextSibling.querySelector(`#row-${currentRow(cell)}`)
+
+    if (!this.isVisited(nextCell)) return nextCell;
+  },
+
+  down: function(cell) {
+    if (currentRow(cell) + 1 > tracker.matrixSize) return;
+
+    const nextCell = cell.nextSibling;
+
+    if (!this.isVisited(nextCell)) return nextCell;
+  },
+
+  left: function(cell) {
+    if (currentCol(cell) - 1 <= 0) return;
+
+    const nextCell = cell.parentNode.previousSibling.querySelector(`#row-${currentRow(cell)}`)
+
+    if (!this.isVisited(nextCell)) return nextCell;
+  },
+
+  validPaths: function(cell) {
+    let paths = [];
+
+    if (this.up(cell)) paths.push('up');
+    if (this.down(cell)) paths.push('down');
+    if (this.right(cell)) paths.push('right');
+    if (this.left(cell)) paths.push('left');
+
+    return paths;
+  },
+
+  isVisited: function(cell) {
+    return (currentColRow(cell)) in tracker.visited
+  }
 }
 
-function up(cell) {
-  if (currentRow(cell) - 1 <= 0) return;
-
-  const nextCell = cell.previousSibling;
-
-  if (isNotVisited(nextCell)) return nextCell;
+const tracker = {
+  startingCell: null,
+  endingCell: null,
+  isStartingCellSet: false,
+  isEndingCellSet: false,
+  currentCell: null,
+  matrixSize: 0,
+  visited: {}
 }
 
-function right(cell) {
-  if (currentCol(cell) + 1 > tracker.matrixSize) return;
-
-  const nextCell = cell.parentNode.nextSibling.querySelector(`#row-${currentRow(cell)}`)
-
-  if (isNotVisited(nextCell)) return nextCell;
-}
-
-function down(cell) {
-  if (currentRow(cell) + 1 > tracker.matrixSize) return;
-
-  const nextCell = cell.nextSibling;
-
-  if (isNotVisited(nextCell)) return nextCell;
-}
-
-function left(cell) {
-  if (currentCol(cell) - 1 <= 0) return;
-
-  const nextCell = cell.parentNode.previousSibling.querySelector(`#row-${currentRow(cell)}`)
-
-  if (isNotVisited(nextCell)) return nextCell;
-}
-
-function validPaths(cell) {
-  let paths = [];
-
-  if (up(cell)) paths.push('up');
-  if (down(cell)) paths.push('down');
-  if (right(cell)) paths.push('right');
-  if (left(cell)) paths.push('left');
-
-  return paths;
-}
