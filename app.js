@@ -105,12 +105,15 @@ function randomSearch() {
     }
 
     tracker.currentCell = nextCell;
-    tracker.currentCell.style.backgroundColor = 'blue';
-    tracker.visited[currentColRow(tracker.currentCell)] = true;
-  }
 
-  if (tracker.currentCell == tracker.endingCell) {
-    tracker.currentCell.style.backgroundColor = 'purple';
+    setTimeout(cell => {
+      if (cell == tracker.endingCell) {
+        cell.style.backgroundColor = 'purple';
+      } else {
+        cell.style.backgroundColor = 'blue'
+      }}, tracker.timeout += 200, tracker.currentCell)
+
+    tracker.visited[currentColRow(tracker.currentCell)] = true;
   }
 }
 
@@ -182,6 +185,7 @@ const tracker = {
   isEndingCellSet: false,
   currentCell: null,
   matrixSize: 0,
-  visited: {}
+  visited: {},
+  timeout: 100
 }
 
