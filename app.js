@@ -30,6 +30,9 @@ algoListElement.addEventListener("click", e => {
     case 'js-randomSearch':
       randomSearch();
       break;
+    case 'js-dfs':
+      dfs();
+      break;
     default:
       return;
   }
@@ -78,6 +81,50 @@ function updateStartAndEndCells(target) {
   }
 }
 
+function dfs() {
+  if (!tracker.startingCell || !tracker.endingCell) return;
+
+  let visited = {};
+  let found = false;
+  let timeout = 100;
+  helper(tracker.startingCell, false);
+
+  function helper(cell) {
+    if (found || currentColRow(cell) in visited) {
+      return;
+    } else if (cell === tracker.endingCell) {
+      found = true;
+    }
+
+    visited[currentColRow(cell)] = true;
+
+    setTimeout(currentCell => {
+      if (currentCell === tracker.endingCell) {
+        currentCell.style.backgroundColor = 'purple';
+      } else if (cell !== tracker.startingCell) {
+        currentCell.style.backgroundColor = 'blue';
+      }
+    }, timeout += 200, cell)
+
+    navigation.validPaths(cell).forEach(path => {
+      helper(nextCell(path, cell), found);
+    })
+  }
+}
+
+function nextCell(path, cell) {
+  switch(path) {
+    case 'up':
+      return navigation.up(cell);
+    case 'right':
+      return navigation.right(cell);
+    case 'down':
+      return navigation.down(cell);
+    case 'left':
+      return navigation.left(cell);
+  }
+}
+
 function randomSearch() {
   if (!tracker.startingCell || !tracker.endingCell) return;
 
@@ -91,20 +138,7 @@ function randomSearch() {
 
     if (isNaN(direction)) return;
 
-    switch(paths[direction]) {
-      case 'up':
-        nextCell = navigation.up(tracker.currentCell); break;
-      case 'right':
-        nextCell = navigation.right(tracker.currentCell);
-        break;
-      case 'down':
-        nextCell = navigation.down(tracker.currentCell);
-        break;
-      case 'left':
-        nextCell = navigation.left(tracker.currentCell);
-    }
-
-    tracker.currentCell = nextCell;
+    tracker.currentCell = nextCell(paths[direction], tracker.currentCell);
 
     setTimeout(cell => {
       if (cell == tracker.endingCell) {
