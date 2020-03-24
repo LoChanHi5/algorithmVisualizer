@@ -128,26 +128,28 @@ function nextCell(path, cell) {
 function randomSearch() {
   if (!tracker.startingCell || !tracker.endingCell) return;
 
+  currentCell = tracker.startingCell;
+
+  const paths = ['up', 'down', 'left', 'right'];
   let direction;
-  tracker.currentCell = tracker.startingCell;
-  tracker.visited[currentColRow(tracker.currentCell)] = true;
+  let visited = {[currentColRow(currentCell)]: true};
+  let timeout = 100;
 
-  while (tracker.currentCell != tracker.endingCell) {
-    paths = navigation.validPaths(tracker.currentCell)
-    direction = Math.floor(Math.random() * 10) % paths.length;
+  while (currentCell != tracker.endingCell) {
+    direction = Math.floor(Math.random() * 10) % 4;
 
-    if (isNaN(direction)) return;
+    while (currentColRow(currentCell) in visited) {
+      currentCell = nextCell(paths[direction], currentCell);
+    }
 
-    tracker.currentCell = nextCell(paths[direction], tracker.currentCell);
+    visited[currentColRow(currentCell)] = true;
 
     setTimeout(cell => {
       if (cell == tracker.endingCell) {
         cell.style.backgroundColor = 'purple';
       } else {
         cell.style.backgroundColor = 'blue'
-      }}, tracker.timeout += 200, tracker.currentCell)
-
-    tracker.visited[currentColRow(tracker.currentCell)] = true;
+      }}, timeout += 200, currentCell)
   }
 }
 
@@ -167,33 +169,25 @@ const navigation = {
   up: function(cell) {
     if (currentRow(cell) - 1 <= 0) return;
 
-    const nextCell = cell.previousSibling;
-
-    if (!this.isVisited(nextCell)) return nextCell;
+    return cell.previousSibling;
   },
 
   right: function(cell) {
     if (currentCol(cell) + 1 > tracker.matrixSize) return;
 
-    const nextCell = cell.parentNode.nextSibling.querySelector(`#row-${currentRow(cell)}`)
-
-    if (!this.isVisited(nextCell)) return nextCell;
+    return cell.parentNode.nextSibling.querySelector(`#row-${currentRow(cell)}`)
   },
 
   down: function(cell) {
     if (currentRow(cell) + 1 > tracker.matrixSize) return;
 
-    const nextCell = cell.nextSibling;
-
-    if (!this.isVisited(nextCell)) return nextCell;
+    return cell.nextSibling;
   },
 
   left: function(cell) {
     if (currentCol(cell) - 1 <= 0) return;
 
-    const nextCell = cell.parentNode.previousSibling.querySelector(`#row-${currentRow(cell)}`)
-
-    if (!this.isVisited(nextCell)) return nextCell;
+    return cell.parentNode.previousSibling.querySelector(`#row-${currentRow(cell)}`)
   },
 
   validPaths: function(cell) {
@@ -205,10 +199,6 @@ const navigation = {
     if (this.left(cell)) paths.push('left');
 
     return paths;
-  },
-
-  isVisited: function(cell) {
-    return (currentColRow(cell)) in tracker.visited
   }
 }
 
@@ -217,9 +207,6 @@ const tracker = {
   endingCell: null,
   isStartingCellSet: false,
   isEndingCellSet: false,
-  currentCell: null,
-  matrixSize: 0,
-  visited: {},
-  timeout: 100
+  matrixSize: 0
 }
 
