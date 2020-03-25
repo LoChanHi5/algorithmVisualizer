@@ -87,10 +87,11 @@ function dfs() {
   let visited = {};
   let found = false;
   let timeout = 100;
+  const paths = ['up', 'right', 'down', 'left'];
   helper(tracker.startingCell, false);
 
   function helper(cell) {
-    if (found || currentColRow(cell) in visited) {
+    if (!cell || found || currentColRow(cell) in visited) {
       return;
     } else if (cell === tracker.endingCell) {
       found = true;
@@ -106,7 +107,7 @@ function dfs() {
       }
     }, timeout += 200, cell)
 
-    navigation.validPaths(cell).forEach(path => {
+    paths.forEach(path => {
       helper(nextCell(path, cell), found);
     })
   }
@@ -134,12 +135,19 @@ function randomSearch() {
   let direction;
   let visited = {[currentColRow(currentCell)]: true};
   let timeout = 100;
+  let tempCell;
 
   while (currentCell != tracker.endingCell) {
     direction = Math.floor(Math.random() * 10) % 4;
 
     while (currentColRow(currentCell) in visited) {
-      currentCell = nextCell(paths[direction], currentCell);
+      tempCell = currentCell;
+
+      while (!tempCell) {
+        tempCell = nextCell(paths[direction], currentCell);
+      }
+
+      currentCell = tempCell;
     }
 
     visited[currentColRow(currentCell)] = true;
