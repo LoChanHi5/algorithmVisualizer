@@ -138,12 +138,12 @@ function randomSearch() {
   let tempCell;
 
   while (currentCell != tracker.endingCell) {
-    direction = Math.floor(Math.random() * 10) % 4;
-
     while (currentColRow(currentCell) in visited) {
-      tempCell = currentCell;
+      direction = Math.floor(Math.random() * 10) % 4;
+      tempCell = nextCell(paths[direction], currentCell);
 
       while (!tempCell) {
+        direction = Math.floor(Math.random() * 10) % 4;
         tempCell = nextCell(paths[direction], currentCell);
       }
 
